@@ -85,7 +85,7 @@ class RequestHandler {
                 return
             }
             
-            let streamReqeust = createAFStreamRequest(request: request).responseDecodableEventSource { (source: DataStreamRequest.DecodableEventSource<T>) in
+            let streamRequest = createAFStreamRequest(request: request).responseDecodableEventSource { (source: DataStreamRequest.DecodableEventSource<T>) in
                 switch source.event {
                 case .message(let message):
                     if let data = message.data {
@@ -108,7 +108,7 @@ class RequestHandler {
             }
             
             continuation.onTermination = { _ in
-                streamReqeust.cancel()
+                streamRequest.cancel()
             }
         }
     }
