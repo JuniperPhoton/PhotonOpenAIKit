@@ -123,4 +123,4 @@ ThrottlingOutputTextView(outputText: viewModel.$text)
 
 # Example
 
-Please feel free to check out the example in this repo.
+Please feel free to check out the example in this repo: https://github.com/JuniperPhoton/PhotonOpenAIKit/tree/main/PhotonOpenAIKitSample
