@@ -6,7 +6,7 @@ import PackageDescription
 let package = Package(
     name: "PhotonOpenAIKit",
     platforms: [
-        .iOS(.v13),
+        .iOS(.v14),
         .macOS(.v11),
     ],
     products: [
