@@ -115,7 +115,8 @@ extension ChatCompletion {
                 ]
                 
                 if let systemMessage = systemMessage {
-                    messages.append(.init(role: "system", content: systemMessage))
+                    // System message should be at first
+                    messages.insert(.init(role: "system", content: systemMessage), at: 0)
                 }
                 
                 if let assistantMessage = assistantMessage {
