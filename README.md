@@ -60,7 +60,7 @@ After constructing a `ChatCompletion.Request`, now you can send the request and 
 ```swift
 let task = Task {
      let request = ChatCompletion.Request(.init(userMessage: userMessage))
-     let stream = client.chatCompletion.streamChatCompletion(request: request) { response in
+     let stream = client.chatCompletion.stream(request: request) { response in
          response.choices.first?.delta.content ?? ""
      }
      do {

@@ -73,6 +73,37 @@ class RequestHandler {
         self.defaultHeaders = defaultHeaders
     }
     
+    func request<T>(request: any AIRequest) async throws -> T where T: Decodable {
+        let afRequest = createAFRequest(request: request)
+        
+        return try await withTaskCancellationHandler(operation: {
+            return try await self.request(request: afRequest)
+        }, onCancel: {
+            runOnDefaultLog { logger in
+                logger.log("cancel on request \(request.url)")
+            }
+            afRequest.cancel()
+        })
+    }
+    
+    func request<T>(request: DataRequest) async throws -> T where T: Decodable {
+        return try await withCheckedThrowingContinuation { continuation in
+            request.responseDecodable(of: T.self) { response in
+                if let data = response.value {
+                    continuation.resume(returning: data)
+                } else {
+                    let error = response.tryGetError()
+                    
+                    if error != nil {
+                        continuation.resume(throwing: error!)
+                    } else {
+                        continuation.resume(throwing: PhotonAIClient.RequestError("Unknown error"))
+                    }
+                }
+            }
+        }
+    }
+    
     func stream<T, R>(request: any AIRequest,
                       transformer: @escaping (T) -> R) -> AsyncThrowingStream<R, Error> where T: Codable {
         return AsyncThrowingStream { continuation in
@@ -108,6 +139,9 @@ class RequestHandler {
             }
             
             continuation.onTermination = { _ in
+                runOnDefaultLog { logger in
+                    logger.log("cancel on request \(request.url)")
+                }
                 streamRequest.cancel()
             }
         }
@@ -116,14 +150,41 @@ class RequestHandler {
     private func createAFStreamRequest(request: any AIRequest) -> Alamofire.DataStreamRequest {
         return AF.streamRequest(request.url,
                                 method: request.getAlamofireMethod()) { r in
-            for (name, value) in self.defaultHeaders {
-                r.headers.add(name: name, value: value)
-            }
-            
-            if let bodyData = try? self.jsonEncoder.encode(request.body) {
-                r.httpBody = bodyData
-            }
+            self.addHeaders(request: &r, body: request.body)
         }
+    }
+    
+    private func createAFRequest(request: any AIRequest) -> DataRequest {
+        return AF.request(request.url, method: request.getAlamofireMethod()) { r in
+            self.addHeaders(request: &r, body: request.body)
+        }
+    }
+    
+    private func addHeaders(request: inout URLRequest, body: Codable) {
+        for (name, value) in self.defaultHeaders {
+            request.headers.add(name: name, value: value)
+        }
+        
+        if let bodyData = try? self.jsonEncoder.encode(body) {
+            request.httpBody = bodyData
+        }
+    }
+}
+
+extension DataResponse {
+    func tryGetError() -> Error? {
+        let error: Error?
+        
+        if self.error != nil {
+            error = PhotonAIClient.RequestError(self.error?.localizedDescription ?? "Unknown error description")
+        } else if let response = self.response,
+                  !(200..<300).contains(response.statusCode) {
+            error = PhotonAIClient.RequestError("Response with non-success status code", code: response.statusCode)
+        } else {
+            error = nil
+        }
+        
+        return error
     }
 }
 

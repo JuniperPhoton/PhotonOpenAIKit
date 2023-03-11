@@ -10,9 +10,9 @@ import Alamofire
 
 /// Entry point to perform a chat completion request.
 ///
-/// You use ``streamChatCompletion(request:)`` to get an ``AsyncThrowingStream`` with element of ``ChatCompletion.StreamResponse``.
+/// You use ``streamChatCompletion(request:)`` to get an ``AsyncThrowingStream`` with element of ``ChatCompletion/StreamResponse``.
 /// You use ``streamChatCompletion(request:transformer:)`` to get an ``AsyncThrowingStream``,
-/// and you can specify the transformer to convert ``ChatCompletion.StreamResponse`` to your data.
+/// and you can specify the transformer to convert ``ChatCompletion/StreamResponse`` to your data.
 public class ChatCompletion {
     private let handler: RequestHandler
     
@@ -23,13 +23,13 @@ public class ChatCompletion {
     /// Chat completion in stream mode.
     /// This method returns an AsyncSequence, representing as ``AsyncThrowingStream``.
     ///
-    /// You try await the sequence to get the stream result of ``ChatCompletion.StreamResponse``.
-    /// To transform the ``ChatCompletion.StreamResponse`` to your data, use ``streamChatCompletion(request:transformer:)``.
+    /// You try await the sequence to get the stream result of ``ChatCompletion/StreamResponse``.
+    /// To transform the ``ChatCompletion/StreamResponse`` to your data, use ``streamChatCompletion(request:transformer:)``.
     ///
-    /// Since it runs on the Swift Concurrency context, to cancel the request, you simply call ``task.cancel()`` and handle the error in the catch block.
+    /// Since it runs on the Swift Concurrency context, to cancel the request, you simply call ``task/cancel()`` and handle the error in the catch block.
     ///
     /// ```
-    /// let stream = streamChatCompletion(request: request)
+    /// let stream = stream(request: request)
     /// do {
     ///   for try await result in stream {
     ///       // handle result
@@ -38,15 +38,24 @@ public class ChatCompletion {
     ///   // handle error
     /// }
     /// ```
-    public func streamChatCompletion(request: ChatCompletion.Request) -> AsyncThrowingStream<ChatCompletion.StreamResponse, Error> {
+    ///
+    /// - parameter request: a ``ChatCompletion/Request`` with stream mode of true.
+    public func stream(request: ChatCompletion.Request) -> AsyncThrowingStream<ChatCompletion.StreamResponse, Error> {
         return handler.stream(request: request, transformer: { $0 })
     }
     
-    /// Like ``streamChatCompletion(request:)``, but you can transform the ``ChatCompletion.StreamResponse`` to your data.
-    /// - parameter transformer: transform the ``ChatCompletion.StreamResponse`` to your data
-    public func streamChatCompletion<T>(request: ChatCompletion.Request,
-                                        transformer: @escaping (ChatCompletion.StreamResponse) -> T) -> AsyncThrowingStream<T, Error> {
+    /// Like ``streamChatCompletion(request:)``, but you can transform the ``ChatCompletion/StreamResponse`` to your data.
+    /// - parameter request: a ``ChatCompletion/Request`` with stream mode of true.
+    /// - parameter transformer: transform the ``ChatCompletion/StreamResponse`` to your data
+    public func stream<T>(request: ChatCompletion.Request,
+                          transformer: @escaping (ChatCompletion.StreamResponse) -> T) -> AsyncThrowingStream<T, Error> {
         return handler.stream(request: request, transformer: transformer)
+    }
+    
+    /// Send request and get the result of ``ChatCompletion/Response``.
+    /// - parameter request: a ``ChatCompletion/Request`` with stream mode of false.
+    public func request(request: ChatCompletion.Request) async throws -> ChatCompletion.Response {
+        return try await handler.request(request: request)
     }
 }
 
@@ -94,7 +103,7 @@ extension ChatCompletion {
             public var logitBias: String? = nil
             public var user: String? = nil
             
-            /// Initialize with a model and some messages.
+            /// Initialize with a model and some messages, with stream mode.
             /// - parameter model: an ``AIModel``, defaults to .gpt_3_5_turbo
             /// - parameter messages: some messages
             public init(model: AIModel = .gpt_3_5_turbo,
@@ -161,6 +170,46 @@ extension ChatCompletion {
 
 extension ChatCompletion {
     /// https://platform.openai.com/docs/api-reference/completions/create
+    public struct Response: Codable {
+        public let id: String
+        public let object: String
+        public let created: Int64
+        public let model: String
+        public let choices: [Choice]
+        
+        public struct Choice: Codable {
+            enum CodingKeys: String, CodingKey {
+                case index = "index"
+                case message = "message"
+                case finishReason = "finish_reason"
+            }
+            
+            public let index: Int
+            public let message: Message
+            public let finishReason: String?
+        }
+    }
+    
+    public struct Usage: Codable {
+        enum CodingKeys: String, CodingKey {
+            case promptTokens = "prompt_tokens"
+            case completionTokens = "completion_tokens"
+            case totalTokens = "total_tokens"
+        }
+        
+        public let promptTokens: Int
+        public let completionTokens: Int
+        public let totalTokens: Int
+    }
+    
+    public struct Message: Codable {
+        public let role: String?
+        public let content: String?
+    }
+}
+
+extension ChatCompletion {
+    /// https://platform.openai.com/docs/api-reference/completions/create
     public struct StreamResponse: Codable {
         public let id: String
         public let object: String
@@ -183,11 +232,6 @@ extension ChatCompletion {
         public struct Choice: Codable {
             public let index: Int
             public let message: [Message]
-        }
-        
-        public struct Message: Codable {
-            public let role: String?
-            public let content: String?
         }
     }
 }
