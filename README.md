@@ -83,7 +83,7 @@ After getting the `AsyncThrowingStream`, you use await-for-loop to get the resul
 
 To get the decoded response directly, you set the request's stream mode to false, and try-await the result:
 
-```
+```swift
 let request = ChatCompletion.Request(.init(userMessage: prompt).apply(block: { body in
     body.temperature = 0.1
     body.stream = false
@@ -104,10 +104,6 @@ do {
 To cancel a request, since it's in Swift Concurrency context, you simply cancel the task:
 
 ```swift
-let task = Task {
-    // 
-}
-
 // Cancel
 task.cancel()
 ```
@@ -146,7 +142,7 @@ ThrottlingOutputTextView(outputText: viewModel.$text)
 ```
 
 
-# Example
+# Full Example
 
 Please feel free to check out the example in this repo: https://github.com/JuniperPhoton/PhotonOpenAIKit/tree/main/PhotonOpenAIKitSample
 
