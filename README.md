@@ -53,9 +53,12 @@ let request = ChatCompletion.Request(.init(messages: messages).apply { body in
 })
 ```
 
-## Send Request
+## Send request
 
-After constructing a `ChatCompletion.Request`, now you can send the request and await for the result. The code below shows how to use SSE to get the messages.
+After constructing a `ChatCompletion.Request`, now you can send the request and await for the result. 
+
+### SSE mode
+The code below shows how to use SSE mode to get the messages.
 
 ```swift
 let task = Task {
@@ -76,7 +79,29 @@ let task = Task {
 
 After getting the `AsyncThrowingStream`, you use await-for-loop to get the result. If the request failed or got cancelled by user, you handle the result in the catch block.
 
-To cancel a request while stream, since it's in Swift Concurrency context, you simply cancel the task:
+### Normal mode
+
+To get the decoded response directly, you set the request's stream mode to false, and try-await the result:
+
+```
+let request = ChatCompletion.Request(.init(userMessage: prompt).apply(block: { body in
+    body.temperature = 0.1
+    body.stream = false
+}))
+
+do {
+    let response = try await aiClient.chatCompletion.request(request: request)
+    let resultMessage = response.choices.first?.message.content ?? ""
+    
+    // do with your resultMessage
+} catch {
+    print("error is \(error)")
+}
+```
+
+### Cancellation
+
+To cancel a request, since it's in Swift Concurrency context, you simply cancel the task:
 
 ```swift
 let task = Task {
