@@ -24,7 +24,7 @@ https://github.com/JuniperPhoton/PhotonOpenAIKit
 import PhotonOpenAIKit
 ```
 
-## Construct the client
+## Create the client
 
 You construct the client with a `API Key` and keep reference to the client:
 
@@ -32,7 +32,9 @@ You construct the client with a `API Key` and keep reference to the client:
 let client = PhotonAIClient(apiKey: apiKey)
 ```
 
-## Create your request body
+If you changed the API key, you just deinit the old instance and construct a new one. Any running tasks should be cancelled by yourself.
+
+## Create the request body
 
 A quick way to construct a chat completion request with user message:
 ```swift
@@ -52,6 +54,8 @@ let request = ChatCompletion.Request(.init(messages: messages).apply { body in
     // other configurations here
 })
 ```
+
+> See the comments of the initializer to know more.
 
 ## Send request
 
