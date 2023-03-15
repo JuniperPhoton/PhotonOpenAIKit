@@ -13,7 +13,7 @@ import OSLog
 public class PhotonAILogger {
     public static var debug = true
     
-    static let defaultLogger = Logger(subsystem: "request", category: "PhotonAIKit")
+    static let defaultLogger = Logger(subsystem: "com.juniperphoton.PhotonOpenAIKit", category: "request")
 }
 
 /// Run the ``block`` with a default logger if ``PhotonAILogger.debug`` is set to true.
