@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import PhotonOpenAIAlamofireAdaptor
 import PhotonOpenAIBase
 
 /// Entry point to communicate with OpenAI Platform.

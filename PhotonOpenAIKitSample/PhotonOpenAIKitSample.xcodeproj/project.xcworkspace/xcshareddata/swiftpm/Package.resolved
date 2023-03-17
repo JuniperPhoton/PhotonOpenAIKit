@@ -14,8 +14,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/JuniperPhoton/AlamofireEventSource",
       "state" : {
-        "branch" : "main",
-        "revision" : "2eeeb9de3a5b1998fe7cd23a097ebe0fa5a0d34c"
+        "revision" : "fb2064e4907f6f38debaa5cc136f390722c33f22",
+        "version" : "1.0.1"
       }
     }
   ],

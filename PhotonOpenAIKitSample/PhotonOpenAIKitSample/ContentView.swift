@@ -7,6 +7,7 @@
 
 import SwiftUI
 import PhotonOpenAIKit
+import PhotonOpenAIAlamofireAdaptor
 
 class MainViewModel: ObservableObject {
     @Published var text: String = ""
@@ -17,7 +18,7 @@ class MainViewModel: ObservableObject {
     private var task: Task<Void, Never>? = nil
     
     func configureClient(apiKey: String) {
-        client = PhotonAIClient(apiKey: apiKey)
+        client = PhotonAIClient(apiKey: apiKey, withAdaptor: AlamofireAdaptor())
     }
     
     func cancel() {
@@ -50,7 +51,7 @@ class MainViewModel: ObservableObject {
             self.text = ""
             
             let request = ChatCompletion.Request(.init(userMessage: userMessage))
-            let stream = client.chatCompletion.streamChatCompletion(request: request) { response in
+            let stream = client.chatCompletion.stream(request: request) { response in
                 response.choices.first?.delta.content ?? ""
             }
             
