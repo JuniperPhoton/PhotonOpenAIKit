@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import Alamofire
 
 public enum AIRequestUrl: String {
     case chatCompletions = "https://api.openai.com/v1/chat/completions"
@@ -32,15 +31,4 @@ public protocol AIRequest {
 public enum AIRequestMethod {
     case get
     case post
-}
-
-public extension AIRequest {
-    func getAlamofireMethod() -> Alamofire.HTTPMethod {
-        switch self.method {
-        case .post:
-            return .post
-        default:
-            return .get
-        }
-    }
 }

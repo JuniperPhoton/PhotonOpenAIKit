@@ -156,3 +156,14 @@ extension DataStreamRequest.Completion {
         return error
     }
 }
+
+public extension AIRequest {
+    func getAlamofireMethod() -> Alamofire.HTTPMethod {
+        switch self.method {
+        case .post:
+            return .post
+        default:
+            return .get
+        }
+    }
+}
