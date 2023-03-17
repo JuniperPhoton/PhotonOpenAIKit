@@ -8,19 +8,19 @@
 import Foundation
 import Alamofire
 
-enum AIRequestUrl: String {
+public enum AIRequestUrl: String {
     case chatCompletions = "https://api.openai.com/v1/chat/completions"
 }
 
-protocol AIRequestBody: Codable {
+public protocol AIRequestBody: Codable {
     // empty
 }
 
-protocol TextAIRequestBody: AIRequestBody {
+public protocol TextAIRequestBody: AIRequestBody {
     var model: AIModel { get }
 }
 
-protocol AIRequest {
+public protocol AIRequest {
     associatedtype Body: AIRequestBody
     
     var body: Body { get }
@@ -29,12 +29,12 @@ protocol AIRequest {
     var streamMode: Bool { get }
 }
 
-enum AIRequestMethod {
+public enum AIRequestMethod {
     case get
     case post
 }
 
-extension AIRequest {
+public extension AIRequest {
     func getAlamofireMethod() -> Alamofire.HTTPMethod {
         switch self.method {
         case .post:

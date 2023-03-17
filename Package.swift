@@ -13,7 +13,7 @@ let package = Package(
         // Products define the executables and libraries a package produces, and make them visible to other packages.
         .library(
             name: "PhotonOpenAIKit",
-            targets: ["PhotonOpenAIKit"]),
+            targets: ["PhotonOpenAIKit", "PhotonOpenAIAlamofireAdaptor", "PhotonOpenAIBase"]),
     ],
     dependencies: [
         // Dependencies declare other packages that this package depends on.
@@ -27,11 +27,20 @@ let package = Package(
         .target(
             name: "PhotonOpenAIKit",
             dependencies: [
+                "PhotonOpenAIBase",
+            ]),
+        .target(
+            name: "PhotonOpenAIBase",
+            dependencies: []),
+        .target(
+            name: "PhotonOpenAIAlamofireAdaptor",
+            dependencies: [
+                "PhotonOpenAIBase",
                 "Alamofire",
                 "AlamofireEventSource"
             ]),
         .testTarget(
             name: "PhotonOpenAIKitTests",
-            dependencies: ["PhotonOpenAIKit"]),
+            dependencies: ["PhotonOpenAIKit", "PhotonOpenAIAlamofireAdaptor", "PhotonOpenAIBase"]),
     ]
 )

@@ -26,10 +26,15 @@ import PhotonOpenAIKit
 
 ## Create the client
 
-You construct the client with a `API Key` and keep reference to the client:
+You construct the client with a `API Key` and a network adaptor and keep reference to the client. The following code shows how to use `Alamofire`, a popular network framework, as the adaptor.
+
+Note that this framework contains a built-in adaptor implementation for `Alamofire`, and you can just import and use it, like the following code.
 
 ```swift
-let client = PhotonAIClient(apiKey: apiKey)
+import PhotonOpenAIAlamofireAdaptor
+
+let adaptor = AlamofireAdaptor()
+let client = PhotonAIClient(apiKey: apiKey, withAdaptor: AlamofireAdaptor())
 ```
 
 If you changed the API key, you just deinit the old instance and construct a new one. Any running tasks should be cancelled by yourself.
@@ -112,7 +117,36 @@ To cancel a request, since it's in Swift Concurrency context, you simply cancel 
 task.cancel()
 ```
 
-## Throttling in SwiftUI
+## Advance usage
+
+### Use your favorite network framework
+
+It's easy to switch to your favorite network framework, instead of using the built-in `Alamofire`.
+
+You import the `PhotonOpenAIBase` module, and adopt the `NetworkAdaptor` protocol.
+
+```swift
+/// Protocol representing a network request handler.
+/// Implement this protocol to perform actual network request.
+///
+/// The default one is ``AlamofireAdaptor``.
+public protocol NetworkAdaptor {
+    /// Send network request and get the decodable result.
+    /// - parameter request: request containing the parameters for a request, like request body and http method.
+    /// - parameter configuration: common configuration for a request, like common headers.
+    func request<T>(request: any AIRequest, configuration: SessionConfiguration) async throws -> T where T: Decodable
+    
+    /// Send network request and get the ``AsyncThrowingStream`` result.
+    /// - parameter request: request containing the parameters for a request, like request body and http method.
+    /// - parameter configuration: common configuration for a request, like common headers.
+    /// - parameter transformer: how the data is transformed before being yield to ``AsyncThrowingStream``.
+    func stream<T, R>(request: any AIRequest,
+                      configuration: SessionConfiguration,
+                      transformer: @escaping (T) -> R) -> AsyncThrowingStream<R, Error> where T: Codable
+}
+```
+
+### Throttling in SwiftUI
 
 You don't want the UI updates too fast, neither it's pretty or performance-friendly.
 

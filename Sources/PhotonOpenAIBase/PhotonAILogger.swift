@@ -17,7 +17,7 @@ public class PhotonAILogger {
 }
 
 /// Run the ``block`` with a default logger if ``PhotonAILogger.debug`` is set to true.
-func runOnDefaultLog(block: (Logger) -> Void) {
+public func runOnDefaultLog(block: (Logger) -> Void) {
     if PhotonAILogger.debug {
         block(PhotonAILogger.defaultLogger)
     }

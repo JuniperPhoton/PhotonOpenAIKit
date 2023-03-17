@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import Alamofire
+import PhotonOpenAIBase
 
 /// Entry point to perform a chat completion request.
 ///
@@ -41,7 +41,7 @@ public class ChatCompletion {
     ///
     /// - parameter request: a ``ChatCompletion/Request`` with stream mode of true.
     public func stream(request: ChatCompletion.Request) -> AsyncThrowingStream<ChatCompletion.StreamResponse, Error> {
-        return handler.stream(request: request, transformer: { $0 })
+        return handler.stream(request: request, configuration: handler.configuration, transformer: { $0 })
     }
     
     /// Like ``streamChatCompletion(request:)``, but you can transform the ``ChatCompletion/StreamResponse`` to your data.
@@ -49,13 +49,14 @@ public class ChatCompletion {
     /// - parameter transformer: transform the ``ChatCompletion/StreamResponse`` to your data
     public func stream<T>(request: ChatCompletion.Request,
                           transformer: @escaping (ChatCompletion.StreamResponse) -> T) -> AsyncThrowingStream<T, Error> {
-        return handler.stream(request: request, transformer: transformer)
+        return handler.stream(request: request, configuration: handler.configuration,
+                              transformer: transformer)
     }
     
     /// Send request and get the result of ``ChatCompletion/Response``.
     /// - parameter request: a ``ChatCompletion/Request`` with stream mode of false.
     public func request(request: ChatCompletion.Request) async throws -> ChatCompletion.Response {
-        return try await handler.request(request: request)
+        return try await handler.request(request: request, configuration: handler.configuration)
     }
 }
 
@@ -152,12 +153,11 @@ extension ChatCompletion {
             }
         }
         
-        let body: Body
+        public let body: Body
+        public let url: String = AIRequestUrl.chatCompletions.rawValue
+        public let method: AIRequestMethod = .post
         
-        let url: String = AIRequestUrl.chatCompletions.rawValue
-        let method: AIRequestMethod = .post
-        
-        var streamMode: Bool {
+        public var streamMode: Bool {
             self.body.stream
         }
         
