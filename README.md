@@ -117,6 +117,26 @@ To cancel a request, since it's in Swift Concurrency context, you simply cancel 
 task.cancel()
 ```
 
+### Error handling
+
+You handle the error on the catch block.
+
+The error to be thrown would be wrapped by `RequestError`, you can get the message and code from the error:
+
+```swift
+/// Error that would be thrown during request.
+/// You use ``message`` to check the message info.
+///
+/// If the response contains status code that is not between 200-300,
+/// then ``code`` is set.
+///
+/// To get the general information:
+/// ```
+/// let errorMessage = String(describing: error)
+/// ```
+public struct RequestError: Error, CustomStringConvertible
+```
+
 ## Advance usage
 
 ### Use your favorite network framework
@@ -178,7 +198,6 @@ struct ThrottlingOutputTextView: View {
 // Use in other view:
 ThrottlingOutputTextView(outputText: viewModel.$text)
 ```
-
 
 # Full Example
 
