@@ -117,7 +117,8 @@ extension ChatCompletion {
             /// - parameter system: system role
             /// - parameter userMessage: user role
             /// - parameter assistant: assistant role
-            public init(userMessage: String,
+            public init(model: AIModel = .gpt_3_5_turbo,
+                        userMessage: String,
                         systemMessage: String? = nil,
                         assistantMessage: String? = nil) {
                 var messages: [ChatCompletion.Request.Message] = [
@@ -133,7 +134,7 @@ extension ChatCompletion {
                     messages.append(.init(role: "assistant", content: assistantMessage))
                 }
                 
-                self.init(messages: messages)
+                self.init(model: model, messages: messages)
             }
             
             public func apply(block: (inout Self) -> Void) -> Self {
