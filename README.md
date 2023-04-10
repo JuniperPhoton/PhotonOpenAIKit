@@ -39,6 +39,17 @@ let client = PhotonAIClient(apiKey: apiKey, withAdaptor: AlamofireAdaptor())
 
 If you changed the API key, you just deinit the old instance and construct a new one. Any running tasks should be cancelled by yourself.
 
+The constructor of `PhotonAIClient` is: 
+
+```swift
+public init(apiKey: String,
+            withAdaptor: any NetworkAdaptor,
+            scheme: String = "https",
+            host: String = openAIHost)
+```
+
+And you can change the scheme and host to yours if available.
+
 ## Create the request body
 
 A quick way to construct a chat completion request with user message:
