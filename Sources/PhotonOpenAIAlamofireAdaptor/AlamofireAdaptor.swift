@@ -26,7 +26,7 @@ public class AlamofireAdaptor: NetworkAdaptor {
             return try await self.request(request: afRequest)
         }, onCancel: {
             runOnDefaultLog { logger in
-                logger.log("cancel on request \(request.url)")
+                logger.log("cancel on request \(request.path)")
             }
             afRequest.cancel()
         })
@@ -55,7 +55,7 @@ public class AlamofireAdaptor: NetworkAdaptor {
                       transformer: @escaping (T) -> R) -> AsyncThrowingStream<R, Error> where T: Codable {
         return AsyncThrowingStream { continuation in
             runOnDefaultLog { logger in
-                logger.log("start request \(request.url)")
+                logger.log("start request \(request.path)")
             }
             
             if !request.streamMode {
@@ -87,7 +87,7 @@ public class AlamofireAdaptor: NetworkAdaptor {
             
             continuation.onTermination = { _ in
                 runOnDefaultLog { logger in
-                    logger.log("cancel on request \(request.url)")
+                    logger.log("cancel on request \(request.path)")
                 }
                 streamRequest.cancel()
             }
@@ -96,7 +96,7 @@ public class AlamofireAdaptor: NetworkAdaptor {
     
     private func createAFStreamRequest(request: any AIRequest,
                                        configuration: SessionConfiguration) -> Alamofire.DataStreamRequest {
-        return AF.streamRequest(request.url,
+        return AF.streamRequest(getURL(request: request, configuration: configuration),
                                 method: request.getAlamofireMethod()) { r in
             self.addHeaders(request: &r, aiReqeust: request, body: request.body, configuration: configuration)
         }
@@ -104,9 +104,15 @@ public class AlamofireAdaptor: NetworkAdaptor {
     
     private func createAFRequest(request: any AIRequest,
                                  configuration: SessionConfiguration) -> DataRequest {
-        return AF.request(request.url, method: request.getAlamofireMethod()) { r in
+        return AF.request(getURL(request: request, configuration: configuration),
+                          method: request.getAlamofireMethod()) { r in
             self.addHeaders(request: &r, aiReqeust: request, body: request.body, configuration: configuration)
         }
+    }
+    
+    private func getURL(request: any AIRequest,
+                        configuration: SessionConfiguration) -> URL {
+        return URL(string: "\(configuration.scheme)://\(configuration.host)\(request.path)")!
     }
     
     private func addHeaders(request: inout URLRequest,

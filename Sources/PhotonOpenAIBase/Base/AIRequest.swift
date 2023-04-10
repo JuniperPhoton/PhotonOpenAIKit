@@ -7,8 +7,10 @@
 
 import Foundation
 
+public let openAIHost = "api.openai.com"
+
 public enum AIRequestUrl: String {
-    case chatCompletions = "https://api.openai.com/v1/chat/completions"
+    case chatCompletions = "/v1/chat/completions"
 }
 
 public protocol AIRequestBody: Codable {
@@ -23,7 +25,7 @@ public protocol AIRequest {
     associatedtype Body: AIRequestBody
     
     var body: Body { get }
-    var url: String { get }
+    var path: String { get }
     var method: AIRequestMethod { get }
     var streamMode: Bool { get }
 }

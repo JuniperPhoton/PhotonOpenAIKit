@@ -29,8 +29,12 @@ public protocol NetworkAdaptor {
 /// Configuration containing common parameters like default headers.
 public struct SessionConfiguration {
     public fileprivate(set) var defaultHeaders: [String: String] = [:]
+    public fileprivate(set) var host: String
+    public fileprivate(set) var scheme: String
     
-    public init(defaultHeaders: [String : String]) {
+    public init(defaultHeaders: [String : String], scheme: String, host: String) {
         self.defaultHeaders = defaultHeaders
+        self.host = host
+        self.scheme = scheme
     }
 }

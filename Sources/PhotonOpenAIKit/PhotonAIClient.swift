@@ -25,15 +25,23 @@ public class PhotonAIClient {
     /// Handle HTTP request.
     private let handler: RequestHandler
     
-    /// Init this client with ``apiKey`` and a ``NetworkAdapter`` which perform network request.
+    /// Init this client with ``apiKey``, ``NetworkAdapter``, ``scheme`` and ``host``.
     ///
     /// If the ``apiKey`` is changed, you simply reconstruct the ``PhotonAIClient`` and deinit the old one.
-    public init(apiKey: String, withAdaptor: any NetworkAdaptor) {
+    ///
+    /// - parameter apiKey: The api key associated with your account
+    /// - parameter withAdaptor: The instance of NetworkAdaptor protocol to send network request
+    /// - parameter scheme: The url scheme, default to "https"
+    /// - parameter host: The url host, default to "api.openai.com"
+    public init(apiKey: String,
+                withAdaptor: any NetworkAdaptor,
+                scheme: String = "https",
+                host: String = openAIHost) {
         var defaultHeaders = Dictionary<String, String>()
         defaultHeaders["Authorization"] = "Bearer \(apiKey)"
         defaultHeaders["Content-Type"] = "application/json"
         
-        let configuration = SessionConfiguration(defaultHeaders: defaultHeaders)
+        let configuration = SessionConfiguration(defaultHeaders: defaultHeaders, scheme: scheme, host: host)
         
         handler = RequestHandler(adaptor: withAdaptor, configuration: configuration)
         chatCompletion = ChatCompletion(handler: handler)
