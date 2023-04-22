@@ -14,6 +14,12 @@ import PhotonOpenAIBase
 public class AlamofireAdaptor: NetworkAdaptor {
     private let jsonEncoder = JSONEncoder()
     
+    private lazy var defaultSession: Session = {
+        let configuration = URLSessionConfiguration.default
+        configuration.timeoutIntervalForRequest = 3 * 60
+        return Session(configuration: configuration)
+    }()
+    
     public init() {
         // empty
     }
@@ -96,16 +102,16 @@ public class AlamofireAdaptor: NetworkAdaptor {
     
     private func createAFStreamRequest(request: any AIRequest,
                                        configuration: SessionConfiguration) -> Alamofire.DataStreamRequest {
-        return AF.streamRequest(getURL(request: request, configuration: configuration),
-                                method: request.getAlamofireMethod()) { r in
+        return defaultSession.streamRequest(getURL(request: request, configuration: configuration),
+                                            method: request.getAlamofireMethod()) { r in
             self.addHeaders(request: &r, aiReqeust: request, body: request.body, configuration: configuration)
         }
     }
     
     private func createAFRequest(request: any AIRequest,
                                  configuration: SessionConfiguration) -> DataRequest {
-        return AF.request(getURL(request: request, configuration: configuration),
-                          method: request.getAlamofireMethod()) { r in
+        return defaultSession.request(getURL(request: request, configuration: configuration),
+                                      method: request.getAlamofireMethod()) { r in
             self.addHeaders(request: &r, aiReqeust: request, body: request.body, configuration: configuration)
         }
     }
