@@ -155,7 +155,7 @@ extension ChatCompletion {
         }
         
         public let body: Body
-        public let path: String = AIRequestUrl.chatCompletions.rawValue
+        public var path: String = AIRequestUrl.chatCompletions.rawValue
         public let method: AIRequestMethod = .post
         
         public var streamMode: Bool {
@@ -163,8 +163,13 @@ extension ChatCompletion {
         }
         
         /// Construct the request with ``Body``.
-        public init(_ body: Body) {
+        public init(_ body: Body, path: String? = nil) {
             self.body = body
+            if let path = path {
+                self.path = path
+            } else {
+                self.path = AIRequestUrl.chatCompletions.rawValue
+            }
         }
     }
 }
