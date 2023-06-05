@@ -384,7 +384,7 @@
 /* Begin XCRemoteSwiftPackageReference section */
 		225BBA9929BB1AC40022D5CF /* XCRemoteSwiftPackageReference "PhotonOpenAIKit" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/JuniperPhoton/PhotonOpenAIKit";
+			repositoryURL = "https://github.com/PaulGuo/PhotonOpenAIKit";
 			requirement = {
 				branch = main;
 				kind = branch;

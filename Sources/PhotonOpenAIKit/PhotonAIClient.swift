@@ -24,6 +24,9 @@ public class PhotonAIClient {
 
     /// Handle HTTP request.
     private let handler: RequestHandler
+
+    /// Azure mode
+    public let azure: Bool
     
     /// Init this client with ``apiKey``, ``NetworkAdapter``, ``scheme`` and ``host``.
     ///
@@ -36,13 +39,22 @@ public class PhotonAIClient {
     public init(apiKey: String,
                 withAdaptor: any NetworkAdaptor,
                 scheme: String = "https",
-                host: String = openAIHost) {
+                host: String = openAIHost,
+                path: String? = nil,
+                azure: Bool = false) {
         var defaultHeaders = Dictionary<String, String>()
-        defaultHeaders["Authorization"] = "Bearer \(apiKey)"
+
+        if azure {
+            defaultHeaders["api-key"] = "\(apiKey)"
+        } else {
+            defaultHeaders["Authorization"] = "Bearer \(apiKey)"
+        }
+
         defaultHeaders["Content-Type"] = "application/json"
         
         let configuration = SessionConfiguration(defaultHeaders: defaultHeaders, scheme: scheme, host: host)
         
+        self.azure = azure
         handler = RequestHandler(adaptor: withAdaptor, configuration: configuration)
         chatCompletion = ChatCompletion(handler: handler)
     }
