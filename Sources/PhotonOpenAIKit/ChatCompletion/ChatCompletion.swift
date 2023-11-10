@@ -90,7 +90,7 @@ extension ChatCompletion {
                 case user = "user"
             }
             
-            public let model: AIModel
+            public let model: String
             public let messages: [Message]
         
             public var stream: Bool = true
@@ -107,9 +107,17 @@ extension ChatCompletion {
             /// Initialize with a model and some messages, with stream mode.
             /// - parameter model: an ``AIModel``, defaults to .gpt_3_5_turbo
             /// - parameter messages: some messages
-            public init(model: AIModel = .gpt_3_5_turbo,
+            public init(model: AIModel = AIModel.gpt_3_5_turbo,
                         messages: [Message]) {
-                self.model = model
+                self.init(modelName: model.name, messages: messages)
+            }
+            
+            /// Initialize with a model and some messages, with stream mode.
+            /// - parameter modelName: The name of model. Defaults to .gpt_3_5_turbo.
+            /// - parameter messages: some messages
+            public init(modelName: String = AIModel.gpt_3_5_turbo.name,
+                        messages: [Message]) {
+                self.model = modelName
                 self.messages = messages
             }
             
@@ -118,6 +126,22 @@ extension ChatCompletion {
             /// - parameter userMessage: user role
             /// - parameter assistant: assistant role
             public init(model: AIModel = .gpt_3_5_turbo,
+                        userMessage: String,
+                        systemMessage: String? = nil,
+                        assistantMessage: String? = nil) {
+                self.init(
+                    modelName: model.name,
+                    userMessage: userMessage,
+                    systemMessage: systemMessage,
+                    assistantMessage: assistantMessage
+                )
+            }
+            
+            /// Convenience initializer.
+            /// - parameter system: system role
+            /// - parameter userMessage: user role
+            /// - parameter assistant: assistant role
+            public init(modelName: String = AIModel.gpt_3_5_turbo.rawValue,
                         userMessage: String,
                         systemMessage: String? = nil,
                         assistantMessage: String? = nil) {
@@ -134,7 +158,7 @@ extension ChatCompletion {
                     messages.append(.init(role: "assistant", content: assistantMessage))
                 }
                 
-                self.init(model: model, messages: messages)
+                self.init(modelName: modelName, messages: messages)
             }
             
             public func apply(block: (inout Self) -> Void) -> Self {
