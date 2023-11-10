@@ -15,4 +15,10 @@ public enum AIModel: String, Codable {
     case text_davinci_002 = "text-davinci-002"
     case code_davinci_002 = "code-davinci-002"
     case gpt_4 = "gpt-4"
+    
+    /// Get the name of this model.
+    /// API request should use the name as the parameter.
+    public var name: String {
+        self.rawValue
+    }
 }

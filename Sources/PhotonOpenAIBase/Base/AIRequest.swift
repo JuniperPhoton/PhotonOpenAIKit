@@ -18,7 +18,9 @@ public protocol AIRequestBody: Codable {
 }
 
 public protocol TextAIRequestBody: AIRequestBody {
-    var model: AIModel { get }
+    /// The model to use.
+    /// Checkout built-in models in ``AIModel``.
+    var model: String { get }
 }
 
 public protocol AIRequest {
